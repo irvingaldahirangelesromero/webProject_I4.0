@@ -1,1 +1,26 @@
-// inicio
+<!DOCTYPE html>
+<html lang="en"><section></section>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Inicio</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <!-- Header y Footer se incluirán dinámicamente -->
+  <div id="header-footer"></div>
+
+  <main>
+    <h2>Quiénes somos</h2>
+    <p>Somos una empresa dedicada a ofrecer los mejores productos y servicios para ti. Nuestro objetivo es garantizar la calidad y satisfacción de nuestros clientes.</p>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      document.getElementById('header-footer').innerHTML = `
+        ${await (await fetch("header-footer.html")).text()}
+      `;
+    });
+  </script>
+  
+</body>
+</html>
