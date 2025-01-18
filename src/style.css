@@ -1,149 +1,211 @@
 /* Reset básico */
 body, h1, h2, p, ul, li, a, button {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    background-color: #f9f9f9;
-    color: #333;
-  }
-  
-  header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    color: #fff;
-    padding: 0.5rem 2rem;
-    z-index: 1000;
-  }
-  
-  header .logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  header img {
-    height: 50px;
-    margin-right: 10px;
-  }
-  
-  header h1 {
-    font-size: 1.5rem;
-  }
-  
-  header .nav-links {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  header .nav-links a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 1rem;
-    padding: 0.5rem;
-  }
-  
-  header .nav-links a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Main content */
-  main {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 80px auto 0; /* Añadido margen para que no quede bajo el header */
-  }
-  
-  /* Footer */
-  footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 1rem 0;
-  }
-  
-  footer p {
-    margin: 5px 0;
-  }
-  
-  footer .social-links a {
-    margin: 0 10px;
-    color: #fff;
-    text-decoration: none;
-  }
-  
-  footer .social-links a:hover {
-    text-decoration: underline;
-  }
-  
-  /* General: Quitar estilo de enlaces */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 0.5rem 2rem;
+  z-index: 1000;
+}
+
+header .logo-container {
+  display: flex;
+  align-items: center;
+}
+
+header img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+header .nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+header .nav-links a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+
+header .nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* Main content */
+main {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 80px auto 0; /* Añadido margen para que no quede bajo el header */
+}
+
+/* Footer */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+footer p {
+  margin: 5px 0;
+}
+
+footer .social-links a {
+  margin: 0 10px;
+  color: #fff;
+  text-decoration: none;
+}
+
+footer .social-links a:hover {
+  text-decoration: underline;
+}
+
+/* General: Quitar estilo de enlaces */
 header a, footer a {
-    color: white;           /* Cambia el color del texto a blanco */
-    text-decoration: none;  /* Quita el subrayado */
-    font-weight: bold;      /* Opcional: Añadir negrita */
-  }
-  
-  /* Efecto hover para enlaces */
-  header a:hover, footer a:hover {
-    text-decoration: underline; /* Opcional: Subrayado al pasar el mouse */
-  }
-  
-  /* Header específico */
-  header {
-    background-color: #333;     /* Fondo oscuro */
-    color: white;               /* Texto blanco */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  /* Estilo del logo y nombre de la empresa */
-  header .logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  header .logo {
-    height: 50px;               /* Tamaño del logo */
-    margin-right: 10px;
-  }
-  
-  header .company-name {
-    font-size: 1.5em;
-    font-weight: bold;
-  }
-  
-  /* Navegación en el header */
-  header nav a {
-    margin-left: 15px;
-  }
-  
-  /* Footer específico */
-  footer {
-    background-color: #222;     /* Fondo oscuro */
-    color: white;               /* Texto blanco */
-    text-align: center;
-    padding: 15px 20px;
-  }
-  
-  footer p {
-    margin: 5px 0;
-  }
-  
+  color: white;           /* Cambia el color del texto a blanco */
+  text-decoration: none;  /* Quita el subrayado */
+  font-weight: bold;      /* Opcional: Añadir negrita */
+}
+
+/* Efecto hover para enlaces */
+header a:hover, footer a:hover {
+  text-decoration: underline; /* Opcional: Subrayado al pasar el mouse */
+}
+
+/* Header específico */
+header {
+  background-color: #333;     /* Fondo oscuro */
+  color: white;               /* Texto blanco */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Estilo del logo y nombre de la empresa */
+header .logo-container {
+  display: flex;
+  align-items: center;
+}
+
+header .logo {
+  height: 50px;               /* Tamaño del logo */
+  margin-right: 10px;
+}
+
+header .company-name {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+/* Navegación en el header */
+header nav a {
+  margin-left: 15px;
+}
+
+/* Footer específico */
+footer {
+  background-color: #222;     /* Fondo oscuro */
+  color: white;               /* Texto blanco */
+  text-align: center;
+  padding: 15px 20px;
+}
+
+footer p {
+  margin: 5px 0;
+}
+
+/* Estilo para formularios */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Espaciado entre los elementos del formulario */
+  max-width: 400px; /* Ancho máximo del formulario */
+  margin: 0 auto; /* Centrar el formulario */
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para etiquetas */
+form label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* Estilo para campos de entrada */
+form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Estilo para botones */
+form button {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #333;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #555;
+}
+
+/* Estilo para el enlace de "¿Olvidaste tu contraseña?" */
+main a {
+  display: inline-block;
+  margin-top: 1rem;
+  text-align: center;
+  color: #007bff;
+  text-decoration: none;
+}
+
+main a:hover {
+  text-decoration: underline;
+}
+
+/* Centrar títulos de formularios */
+main h2 {
+  text-align: center;
+  margin-bottom: 1rem; /* Espaciado debajo del título */
+  color: #333;
+}
+
