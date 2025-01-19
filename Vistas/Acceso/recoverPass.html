@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="../../src/style.css">
+</head>
+
+<body>
+    <!-- Header y Footer se incluirán dinámicamente -->
+    <div id="header-footer"></div>
+
+    <main id="forms">
+        <form>
+            <h3>Recuperación de tu cuenta</h3>
+            <p>De esta forma sabremos que esta cuenta te pertenece</p>
+            <select name="" id="">
+                    <option value="">20230002@uthh.edu.mx</option>
+            </select>
+            <strong>¿Tienes tu telefono?</strong>
+            <p>Te enviaremos un codigo de verficiación a tu correo para verificar tu identidad</p>
+            <button id="btnSecondMethod">Probar de otra manera</button>
+            <button id="btnConfirm">SI</button>
+        </form>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async() => {
+            document.getElementById('header-footer').innerHTML = `${await (await fetch("../../header-footer.html")).text()}`;
+        });
+
+        const btnSecondMethod = document.getElementById('btnSecondMethod');
+        const btnConfirm = document.getElementById('btnConfirm');
+
+        btnSecondMethod.addEventListener('click', async() => {
+            document.getElementById('SecurityQuestions').innerHTML = `${await(await fetch("SecurityQuestions.html")).text()}`;
+        //     document.getElementById("forms").innerHTML += `<form action="">
+        //         <h3> d</h3>
+        //         <p>De esta forma sabremos que esta cuenta te pertenece</p>
+        //         <select name="" id="">
+        //                 <option value="">20230002@uthh.edu.mx</option>
+        //         </select>
+        //         <strong>¿Tienes tu telefono?</strong>
+        //         <p>Te enviaremos un codigo de verficiación a tu correo para verificar tu identidad</p>
+        //         <button id="btnSecondMethod">Probar de otra manera</button>>
+        //         <button id="btnConfirm">SI</button>
+        // </form>`;
+        });
+        
+
+    </script>
+
+</body>
+
+</html>
