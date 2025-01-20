@@ -8,15 +8,12 @@ body, h1, h2, p, ul, li, a, button {
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
-  background-color: #f9f9f9;
-  color: #333;
 }
 
 header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,7 +30,6 @@ header .logo-container {
 
 header img {
   height: 50px;
-  margin-right: 10px;
 }
 
 header h1 {
@@ -50,10 +46,6 @@ header .nav-links a {
   color: #fff;
   font-size: 1rem;
   padding: 0.5rem;
-}
-
-header .nav-links a:hover {
-  text-decoration: underline;
 }
 
 /* Main content */
@@ -103,7 +95,7 @@ header a:hover, footer a:hover {
 
 /* Header específico */
 header {
-  background-color: #333;     /* Fondo oscuro */
+  background-color: #000;     /* Fondo oscuro */
   color: white;               /* Texto blanco */
   display: flex;
   justify-content: space-between;
@@ -137,7 +129,7 @@ header nav a {
 
 /* Footer específico */
 footer {
-  background-color: #222;     /* Fondo oscuro */
+  background-color: #000;     /* Fondo oscuro */
   color: white;               /* Texto blanco */
   text-align: center;
   padding: 15px 20px;
@@ -152,7 +144,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1rem; /* Espaciado entre los elementos del formulario */
-  max-width: 400px; /* Ancho máximo del formulario */
+  max-width: 425px; /* Ancho máximo del formulario */
   margin: 0 auto; /* Centrar el formulario */
   padding: 1.5rem;
   background-color: #fff;
