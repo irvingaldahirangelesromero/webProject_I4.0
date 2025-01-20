@@ -225,6 +225,8 @@ main h2 {
   justify-content: center;
   gap: 5px;
   margin-bottom: 20px;
+  -moz-appearance: textfield;
+  appearance: none;
 }
 
 .code-input {
@@ -235,6 +237,8 @@ main h2 {
   border: 1px solid #ccc;
   border-radius: 5px;
   outline: none;
+    -moz-appearance: textfield;
+      appearance: none;
   transition: border-color 0.3s;
 }
 
