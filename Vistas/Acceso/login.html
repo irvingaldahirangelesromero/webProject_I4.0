@@ -7,16 +7,20 @@
   <link rel="stylesheet" href="../../src/style.css">
 </head>
 <body>
-  <!-- Header y Footer se incluirán dinámicamente -->
-  <div id="header-footer"> </div>
+  <div id="header-footer"></div>
 
   <main>
     <h2>Iniciar Sesión</h2>
-    <form action="#">
+    <form action="#" id="login-form">
       <label for="email">Correo Electrónico:</label>
-        <input type="email" id="txt_email" placeholder="ejemplo@correo.com" required>
+      <input type="email" id="txt_email" placeholder="ejemplo@correo.com" required>
+      
       <label for="password">Contraseña:</label>
+      <div class="password-container">
         <input type="password" id="txt_password" placeholder="Ingresa tu contraseña" required>
+        <button type="button" class="toggle-password" data-target="txt_password">👁</button>
+      </div>
+
       <button type="submit" id="btn_login">Iniciar Sesión</button>
       <a href="recoverPass.html">¿Olvidaste tu contraseña?</a>
     </form>
