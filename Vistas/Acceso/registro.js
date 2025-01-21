@@ -10,16 +10,12 @@ btn_registrar.addEventListener('click',e=>{
     const txt_password = document.querySelector("#txt_password")
     createUserWithEmailAndPassword(auth, txt_email.value, txt_password.value)
   .then((userCredential) => {
-    // Signed in 
     const user = userCredential.user;
-    console.log("cuenta registrada correctamente")
-    console.log(user)
-    // ...
   })
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log(errorMessage)
-    // ..
+    console.log(errorCode);
+    console.log(errorMessage);
   });
 })

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="../../src/style.css">
+</head>
+
+<body>
+    <!-- Header y Footer se incluirán dinámicamente -->
+    <div id="header-footer"></div>
+
+    <main>
+        <h2>Restauración de contraseña</h2>
+        <form action="#" id="frm_pass_restore">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="txt_password" placeholder="Ingresa tu contraseña" required>
+            <label for="confirm-password">Confirmar Contraseña:</label>
+            <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" required>
+            <button type="submit" id="btn_registrar">Registrarse</button>
+        </form>
+    </main>
+    <script type="module" src="registro.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            document.getElementById('header-footer').innerHTML = `
+        ${await (await fetch("../../header-footer.html")).text()}
+        `;
+        });
+    </script>
+
+</body>
+
+</html>
