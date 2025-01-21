@@ -14,7 +14,7 @@ btn_login.addEventListener("click", (e) => {
             const user = userCredential.user;
             console.log("credenciales válidas");
             console.log(user);
-            window.location.href = "productos.html";
+            window.location.href = "products.html";
         })
         .catch((error) => {
             const errorMessage = error.message;
@@ -29,7 +29,7 @@ btn_login.addEventListener("click", (e) => {
 //     signInWithPopup(auth, provider)
 //         .then((result) => {
 //             const user = result.user;
-//             document.location.href = "productos.html";
+//             document.location.href = "products.html";
 //         })
 //         .catch((error) => {
 //             const errorMessage = error.message;
@@ -44,7 +44,7 @@ btn_login.addEventListener("click", (e) => {
 //     signInWithPopup(auth, provider)
 //         .then((result) => {
 //             const user = result.user;
-//             document.location.href = "productos.html";
+//             document.location.href = "products.html";
 //         })
 //         .catch((error) => {
 //             const errorMessage = error.message;
