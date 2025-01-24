@@ -1,11 +1,19 @@
-<form action="#">
-    <h2>Preguntas de seguridad</h2>
-    <label for="namePet">¿Cómo se llamó tu primera mascota?</label>
-    <input type="text" id="namePet" placeholder="Ej. Lucky" required>
-    <label for="favoriteColor">Tu postre favorita</label>
-    <input type="text" id="namePet" placeholder="Ej. Pay" required>
-    <label for="namePet">El nombre del tu mejor amigo</label>
-    <input type="text" id="namePet" placeholder="Ej. Julio Alberto" required>
+<form class="frm">
+    <h2>Recuperación mediante preguntas secretas</h2>
+    <p>Responde las siguientes preguntas de seguridad para verificar tu identidad:</p>
+    
+    <label for="securityQuestion">Selecciona una pregunta</label>
+    <select id="securityQuestion">
+        <option value="">Selecciona una pregunta...</option>
+        <option value="pet">¿Nombre de tu primera mascota?</option>
+        <option value="school">¿Nombre de tu escuela primaria?</option>
+        <option value="city">¿Ciudad donde naciste?</option>
+        <option value="food">¿Cuál es tu comida favorita?</option>
+        <option value="movie">¿Cuál es tu película favorita?</option>
+    </select>
+    
+    <label for="answer">Tu respuesta:</label>
+    <input type="text" id="answer" placeholder="Escribe tu respuesta aquí">
 
-    <button type="submit" id="verify">Comprobar</button>
+    <button id="btnConfirmVerification">Enviar código de verificación</button>
 </form>

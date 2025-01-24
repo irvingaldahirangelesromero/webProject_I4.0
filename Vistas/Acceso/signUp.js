@@ -1,9 +1,16 @@
 import { auth } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { onGetUsers, saveUser, deleteUser, getUser, updateUser } from "./firebaseU.js";
 
 const btnRegistrar = document.getElementById("btn_registrar");
 const togglePasswordButtons = document.querySelectorAll(".toggle-password");
+const signUpForm = document.getElementById("sign-up-form");
+const usersContainer = document.getElementById("users-container");
 
+let editStatus = false;
+let id = "";
+
+// Funcionalidad para mostrar/ocultar contraseñas
 togglePasswordButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const targetInput = document.getElementById(button.dataset.target);
@@ -13,54 +20,137 @@ togglePasswordButtons.forEach((button) => {
   });
 });
 
-btnRegistrar.addEventListener("click", (e) => {
+// Validaciones
+function validateForm() {
+  const email = signUpForm["txt_email"].value.trim();
+  const password = signUpForm["txt_password"].value.trim();
+  const confirmPassword = signUpForm["confirm-password"].value.trim();
+  const phone = signUpForm["phone"].value.trim();
+  const question = signUpForm["question"].value.trim();
+  const answer = signUpForm["answer"].value.trim();
+
+  if (password.length < 6) {
+    alert("La contraseña debe tener al menos 6 caracteres.");
+    return false;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Las contraseñas no coinciden.");
+    return false;
+  }
+
+  if (!email.includes("@")) {
+    alert("Por favor, introduce un correo electrónico válido.");
+    return false;
+  }
+
+  if (isNaN(phone) || phone.length < 8) {
+    alert("El número telefónico debe contener al menos 8 dígitos y solo números.");
+    return false;
+  }
+
+  if (!question) {
+    alert("Selecciona una pregunta secreta.");
+    return false;
+  }
+
+  if (!answer.trim()) {
+    alert("La respuesta secreta no puede estar vacía.");
+    return false;
+  }
+
+  return true;
+}
+
+// Manejo de usuarios en Firestore
+window.addEventListener("DOMContentLoaded", async () => {
+  onGetUsers((querySnapshot) => {
+    usersContainer.innerHTML = "";
+
+    querySnapshot.forEach((doc) => {
+      const user = doc.data();
+      usersContainer.innerHTML += `
+        <div class="card card-body mt-2 border-primary">
+          <h3 class="h5">${user.name}</h3>
+          <p><strong>Correo:</strong> ${user.email}</p>
+          <p><strong>Teléfono:</strong> ${user.phone}</p>
+          <p><strong>Pregunta Secreta:</strong> ${user.question}</p>
+          <p><strong>Respuesta Secreta:</strong> ${user.answer}</p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-danger btn-delete" data-id="${doc.id}">🗑 Eliminar</button>
+            <button class="btn btn-secondary btn-edit" data-id="${doc.id}">🖉 Editar</button>
+          </div>
+        </div>`;
+    });
+
+    // Botones para eliminar
+    usersContainer.querySelectorAll(".btn-delete").forEach((btn) =>
+      btn.addEventListener("click", async ({ target: { dataset } }) => {
+        try {
+          await deleteUser(dataset.id);
+          alert("Usuario eliminado.");
+        } catch (error) {
+          console.error("Error al eliminar usuario:", error);
+        }
+      })
+    );
+
+    // Botones para editar
+    usersContainer.querySelectorAll(".btn-edit").forEach((btn) =>
+      btn.addEventListener("click", async (e) => {
+        try {
+          const doc = await getUser(e.target.dataset.id);
+          const user = doc.data();
+          signUpForm["name_usr"].value = user.name;
+          signUpForm["txt_email"].value = user.email;
+          signUpForm["phone"].value = user.phone;
+          signUpForm["question"].value = user.question;
+          signUpForm["answer"].value = user.answer;
+
+          editStatus = true;
+          id = doc.id;
+          btnRegistrar.innerText = "Actualizar";
+        } catch (error) {
+          console.error("Error al obtener usuario:", error);
+        }
+      })
+    );
+  });
+});
+
+// Guardar o actualizar usuario
+signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = document.querySelector("#name_usr").value.trim();
-  const email = document.querySelector("#txt_email").value.trim();
-  const password = document.querySelector("#txt_password").value;
-  const confirmPassword = document.querySelector("#confirm-password").value;
+  if (!validateForm()) return;
 
-  // Validar campos vacíos
-  if (!name || !email || !password || !confirmPassword) {
-    alert("Por favor, complete todos los campos.");
-    return;
-  }
-  
-  // Validar el nombre
-  if (!/^[a-zA-Z\s]+$/.test(name)) {
-    alert("El nombre solo debe contener letras y espacios.");
-    return;
-  }
+  const name = signUpForm["name_usr"].value.trim();
+  const email = signUpForm["txt_email"].value.trim();
+  const password = signUpForm["txt_password"].value.trim();
+  const phone = signUpForm["phone"].value.trim();
+  const question = signUpForm["question"].value.trim();
+  const answer = signUpForm["answer"].value.trim();
 
-  // Validar la contraseña
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=])[A-Za-z\d@$!%*?&_=]{8,16}$/;
-  if (!passwordRegex.test(password)) {
-    alert(
-      "La contraseña debe tener entre 8 y 16 caracteres, al menos una letra minúscula, una letra mayúscula, un número y un carácter especial."
-    );
-    return;
-  }
-
-  // Validar confirmación de contraseña
-  if (password !== confirmPassword) {
-    alert("Las contraseñas no son iguales.");
-    return;
-  }
-
-  // Registro en Firebase
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+  try {
+    if (!editStatus) {
+      // Registro en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      alert("Usuario registrado con éxito.");
-    })
-    .catch((error) => {
-      if (error.code === "auth/email-already-in-use") {
-        alert("El correo electrónico ya está registrado.");
-      } else {
-        console.error(error.message);
-        alert("Hubo un error al registrar al usuario.");
-      }
-    });
+
+      // Guardar en Firestore
+      await saveUser(name, email, phone, question, answer);
+      alert("Usuario registrado exitosamente.");
+    } else {
+      await updateUser(id, { name, email, phone, question, answer });
+      alert("Usuario actualizado en Firestore.");
+      editStatus = false;
+      id = "";
+      btnRegistrar.innerText = "Registrarse";
+    }
+
+    signUpForm.reset();
+  } catch (error) {
+    console.error("Error al registrar o guardar usuario:", error);
+    alert("Este correo ya esta registrado, Por favor ingrese uno nuevo.");
+  }
 });

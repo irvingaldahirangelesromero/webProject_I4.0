@@ -6,14 +6,14 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth
 
 // Your web app's Firebase configuration
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyA1BVK0cBnicFymqgfFyRtnenN6Fop01qQ",
-  authDomain: "tienda-444b0.firebaseapp.com",
-  projectId: "tienda-444b0",
-  storageBucket: "tienda-444b0.firebasestorage.app",
-  messagingSenderId: "85178500578",
-  appId: "1:85178500578:web:33ebea8ade67704ddea5bb"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyC2Czv75mK-OVZkHsZkdNP4Wvpq85Ok_40",
+  authDomain: "prueba4b-e8d4d.firebaseapp.com",
+  projectId: "prueba4b-e8d4d",
+  storageBucket: "prueba4b-e8d4d.firebasestorage.app",
+  messagingSenderId: "459652214597",
+  appId: "1:459652214597:web:673239b3de79929f42582c"
+};
   
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);

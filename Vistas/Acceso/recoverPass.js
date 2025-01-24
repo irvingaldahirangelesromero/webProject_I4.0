@@ -1,74 +1,115 @@
-import { auth } from "./firebase.js"; // Importar la instancia de Firebase Auth
-import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"; // Importar funciones de Firebase Auth
+import { auth } from "./firebase.js"; // Firebase Auth
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// const auth = getAuth(); // Inicializa Firebase Auth
+const db = getFirestore(); // Inicializar Firestore
 
 document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('header-footer').innerHTML = await (await fetch("../../header-footer.html")).text();
     const contentForms = document.getElementById('content-forms');
-    
-    async function loadVerificationForm() { //cargar formulario default
+
+    async function loadVerificationForm() {
         contentForms.innerHTML = await (await fetch("frmEmailVerification.html")).text();
-        // Asignar eventos después de que el contenido se cargue
-        
+
         const btnSendEmailVerification = document.getElementById('btnConfirmVerification');
+        const btnSecondMethod = document.getElementById('btnSecondMethod');
 
         btnSendEmailVerification.addEventListener('click', async (event) => {
-            event.preventDefault();            
+            event.preventDefault();
             const email = document.getElementById('usr_email').value;
+
             if (!email) {
-                alert("Por favor, selecciona una dirección de correo electrónico.");
+                alert("Por favor, introduce un correo electrónico.");
                 return;
-            }            
-            
+            }
+
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert("Se ha enviado un correo de verificación a la dirección proporcionada. Ahora puede reestablecer su contraseña desde el enlace proporcionado en el correo.");
-                window.location.href = "../../index.html"; 
-
+                alert("Se ha enviado un correo de restablecimiento de contraseña.");
+                window.location.href = "../../index.html";
             } catch (error) {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-
-                switch (error.code) {
-                    case 'auth/invalid-email':
-                        alert("El correo proporcionado no es válido.");
-                        break;
-                    case 'auth/user-not-found':
-                        alert("No existe una cuenta asociada a este correo.");
-                        break;
-                    case 'auth/missing-email':
-                        alert("No se ha proporcionado un correo electrónico. Por favor, ingresa uno.");
-                        break; 
-                    case 'auth/timeout':
-                        alert("La solicitud tardó demasiado tiempo. Por favor, inténtalo de nuevo.");
-                        break;
-                    default:
-                        alert(`Error: ${errorCode}: ${errorMessage}`);
-                }
+                handleAuthError(error);
             }
         });
 
+        btnSecondMethod.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('usr_email').value.trim();
 
+            if (!email) {
+                alert("Por favor, introduce un correo electrónico antes de continuar.");
+                return;
+            }
 
-        // const btnSecondMethod = document.getElementById('btnSecondMethod');
+            // Guardar el correo en una variable para la siguiente pantalla
+            sessionStorage.setItem("emailForSecurityQuestions", email);
 
-        // btnSecondMethod.addEventListener('click', async (event) => {
-        //     event.preventDefault();
-        //     await loadSecurityQuestionsForm(); // Cargar el formulario de preguntas de seguridad
-        // });
-
-        // async function loadSecurityQuestionsForm() {   // Cargar el formulario de preguntas de seguridad
-        //     contentForms.innerHTML = await (await fetch("frmSecurityQuestions.html")).text();
-        // }
+            await loadSecurityQuestionsForm();
+        });
     }
 
+    async function loadSecurityQuestionsForm() {
+        contentForms.innerHTML = await (await fetch("frmSecurityQuestions.html")).text();
 
-    async function loadEmailVerificationMethod() {   // Enviar códrreo de verificación
-        contentForms.innerHTML = await (await fetch("frmPassRestore.html")).text();
+        const btnConfirmVerification = document.getElementById('btnConfirmVerification');
+        const email = sessionStorage.getItem("emailForSecurityQuestions"); // Recuperar el correo ingresado
+
+        if (!email) {
+            alert("No se detectó un correo electrónico válido. Por favor, regresa e ingrésalo.");
+            window.location.href = "recoverPass.html";
+            return;
+        }
+
+        btnConfirmVerification.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            const question = document.getElementById('securityQuestion').value;
+            const answer = document.getElementById('answer').value.trim();
+
+            if (!question || !answer) {
+                alert("Por favor, completa todos los campos.");
+                return;
+            }
+
+            try {
+                console.log("Consultando Firestore con los datos:");
+                console.log(`Email: ${email}, Question: ${question}, Answer: ${answer}`);
+
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("email", "==", email), where("question", "==", question), where("answer", "==", answer));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    console.log("Usuario encontrado. Enviando correo de recuperación...");
+                    await sendPasswordResetEmail(auth, email);
+                    alert("Se ha enviado un correo de restablecimiento de contraseña.");
+                    window.location.href = "../../index.html";
+                } else {
+                    console.warn("Usuario no encontrado o los datos no coinciden.");
+                    alert("La pregunta y respuesta no coinciden con la información registrada.");
+                }
+            } catch (error) {
+                console.error("Error al verificar las preguntas de seguridad:", error);
+                alert("Hubo un error al verificar tu identidad. Inténtalo de nuevo.");
+            }
+        });
     }
 
-    // Inicializar la carga del primer formulario
-    await loadEmailVerificationMethod();
+    function handleAuthError(error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        switch (errorCode) {
+            case "auth/invalid-email":
+                alert("El correo proporcionado no es válido.");
+                break;
+            case "auth/user-not-found":
+                alert("No existe una cuenta asociada a este correo.");
+                break;
+            default:
+                alert(`Error: ${errorCode}: ${errorMessage}`);
+        }
+    }
+
     await loadVerificationForm();
 });
