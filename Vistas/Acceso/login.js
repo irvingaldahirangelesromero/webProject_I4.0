@@ -44,7 +44,7 @@ btnLogin.addEventListener("click", (e) => {
     .then((userCredential) => {
       const user = userCredential.user;
       alert("Inicio de sesión exitoso.");
-      window.location.href = "products.html";
+      window.location.href = "/Vistas/Admin/products.html";
     })
     .catch((error) => {
       alert("Correo o contraseña incorrectos. Por favor, inténtelo nuevamente.");

@@ -93,10 +93,10 @@ window.onload = () => {
 
     // Configurar el botón de cerrar sesión
     document.getElementById('btn_logout').addEventListener('click', () => {
-        import('./firebase.js').then(({ auth }) => {
+        import('../Acceso/firebase.js').then(({ auth }) => {
             import('https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js').then(({ signOut }) => {
                 signOut(auth).then(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = '/Vistas/Acceso/login.html';
                 }).catch((error) => {
                     console.error("Error al cerrar sesión:", error.message);
                 });
