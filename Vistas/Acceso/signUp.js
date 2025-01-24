@@ -1,143 +1,225 @@
 import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { onGetUsers, saveUser, deleteUser, getUser, updateUser } from "./firebaseU.js";
 
-const btnLogin = document.getElementById("btn_login");
+const btnRegistrar = document.getElementById("btn_registrar");
+const togglePasswordButtons = document.querySelectorAll(".toggle-password");
+const signUpForm = document.getElementById("sign-up-form");
+const usersContainer = document.getElementById("users-container");
 
-// Función para alternar la visibilidad de la contraseña
-document.querySelectorAll(".toggle-password").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const targetId = btn.getAttribute("data-target");
-    const input = document.getElementById(targetId);
-    if (input.type === "password") {
-      input.type = "text";
-      btn.textContent = "🙈";
-    } else {
-      input.type = "password";
-      btn.textContent = "👁";
-    }
+let editStatus = false;
+let id = "";
+
+// Funcionalidad para mostrar/ocultar contraseñas
+togglePasswordButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const targetInput = document.getElementById(button.dataset.target);
+    const isPassword = targetInput.type === "password";
+    targetInput.type = isPassword ? "text" : "password";
+    button.textContent = isPassword ? "🙈" : "👁";
   });
 });
 
-// Expresión regular para validar correo
-const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// Validaciones
+function validateForm() {
+  const name = signUpForm["name_usr"].value.trim();
+  const email = signUpForm["txt_email"].value.trim();
+  const password = signUpForm["txt_password"].value.trim();
+  const confirmPassword = signUpForm["confirm-password"].value.trim();
+  const phone = signUpForm["phone"].value.trim();
+  const question = signUpForm["question"].value.trim();
+  const answer = signUpForm["answer"].value.trim();
 
-// Validar formulario de login
-btnLogin.addEventListener("click", async (e) => {
+  // Validar campos vacíos
+  if (!name || !email || !password || !confirmPassword) {
+    alert("Por favor, complete todos los campos.");
+    return false;
+  }
+
+  // Validar nombre (solo letras)
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+  if (!nameRegex.test(name)) {
+    alert("El nombre solo debe contener letras.");
+    return false;
+  }
+
+  // Validar contraseña
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=])[A-Za-z\d@$!%*?&_=]{8,16}$/;
+  if (!passwordRegex.test(password)) {
+    alert(
+      "La contraseña debe tener entre 8 y 16 caracteres, al menos una letra minúscula, una letra mayúscula, un número y un carácter especial."
+    );
+    return false;
+  }
+
+  // Validar confirmación de contraseña
+  if (password !== confirmPassword) {
+    alert("Las contraseñas no son iguales.");
+    return false;
+  }
+
+  // Validar email
+  if (!email.includes("@") || !email.includes(".")) {
+    alert("Por favor, introduce un correo electrónico válido.");
+    return false;
+  }
+
+  // Validar teléfono
+  const phoneRegex = /^\d{10}$/;
+  if (!phoneRegex.test(phone)) {
+    alert("El número telefónico debe contener exactamente 10 dígitos.");
+    return false;
+  }
+
+  // Validar pregunta secreta
+  if (!question) {
+    alert("Selecciona una pregunta secreta.");
+    return false;
+  }
+
+  // Validar respuesta secreta
+  if (!answer.trim()) {
+    alert("La respuesta secreta no puede estar vacía.");
+    return false;
+  }
+
+  return true;
+}
+
+// Manejo de usuarios en Firestore
+window.addEventListener("DOMContentLoaded", async () => {
+  onGetUsers((querySnapshot) => {
+    usersContainer.innerHTML = "";
+
+    querySnapshot.forEach((doc) => {
+      const user = doc.data();
+      usersContainer.innerHTML += `
+        <div class="card card-body mt-2 border-primary">
+          <h3 class="h5">${user.name}</h3>
+          <p><strong>Correo:</strong> ${user.email}</p>
+          <p><strong>Teléfono:</strong> ${user.phone}</p>
+          <p><strong>Pregunta Secreta:</strong> ${user.question}</p>
+          <p><strong>Respuesta Secreta:</strong> ${user.answer}</p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-danger btn-delete" data-id="${doc.id}">🗑 Eliminar</button>
+            <button class="btn btn-secondary btn-edit" data-id="${doc.id}">🖉 Editar</button>
+          </div>
+        </div>`;
+    });
+
+    // Botones para eliminar
+    usersContainer.querySelectorAll(".btn-delete").forEach((btn) =>
+      btn.addEventListener("click", async ({ target: { dataset } }) => {
+        try {
+          await deleteUser(dataset.id);
+          alert("Usuario eliminado.");
+        } catch (error) {
+          console.error("Error al eliminar usuario:", error);
+        }
+      })
+    );
+
+    // Botones para editar
+    usersContainer.querySelectorAll(".btn-edit").forEach((btn) =>
+      btn.addEventListener("click", async (e) => {
+        try {
+          const doc = await getUser(e.target.dataset.id);
+          const user = doc.data();
+          signUpForm["name_usr"].value = user.name;
+          signUpForm["txt_email"].value = user.email;
+          signUpForm["phone"].value = user.phone;
+          signUpForm["question"].value = user.question;
+          signUpForm["answer"].value = user.answer;
+
+          editStatus = true;
+          id = doc.id;
+          btnRegistrar.innerText = "Actualizar";
+        } catch (error) {
+          console.error("Error al obtener usuario:", error);
+        }
+      })
+    );
+  });
+});
+
+// Guardar o actualizar usuario
+signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const txtEmail = document.querySelector("#txt_email");
-  const txtPassword = document.querySelector("#txt_password");
-  const email = txtEmail.value.trim();
-  const password = txtPassword.value;
+  if (!validateForm()) return;
 
-  // Validación de campos vacíos
-  let valid = true;
-
-  // Validación de correo electrónico
-  if (!email || !emailRegex.test(email)) {
-    alert("Por favor, ingrese un correo electrónico válido (debe contener '@' y un dominio).");
-    txtEmail.classList.add("input-invalid");
-    valid = false;
-  } else {
-    txtEmail.classList.remove("input-invalid");
-    txtEmail.classList.add("input-valid");
-  }
-
-  // Validación de contraseña
-  if (!password) {
-    alert("Por favor, ingrese una contraseña.");
-    txtPassword.classList.add("input-invalid");
-    valid = false;
-  } else {
-    txtPassword.classList.remove("input-invalid");
-    txtPassword.classList.add("input-valid");
-  }
-
-  // Si los campos no son válidos, detenemos el proceso
-  if (!valid) {
-    return;
-  }
+  const name = signUpForm["name_usr"].value.trim();
+  const email = signUpForm["txt_email"].value.trim();
+  const password = signUpForm["txt_password"].value.trim();
+  const phone = signUpForm["phone"].value.trim();
+  const question = signUpForm["question"].value.trim();
+  const answer = signUpForm["answer"].value.trim();
 
   try {
-    // Intentar iniciar sesión
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    alert("Inicio de sesión exitoso.");
-    window.location.href = "/Vistas/Admin/products.html";
-  } catch (error) {
-    // Manejo de errores de Firebase
-    const errorCode = error.code;
-    const errorMessage = error.message;
+    if (!editStatus) {
+      // Registro en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    if (errorCode === "auth/user-not-found" || errorCode === "auth/wrong-password") {
-      alert("Correo o contraseña incorrectos. Por favor, inténtelo nuevamente.");
-      txtEmail.classList.add("input-invalid");
-      txtPassword.classList.add("input-invalid");
+      // Guardar en Firestore
+      await saveUser(name, email, phone, question, answer);
+      alert("Usuario registrado exitosamente.");
     } else {
-      alert(`Error al iniciar sesión: ${errorMessage}`);
+      await updateUser(id, { name, email, phone, question, answer });
+      alert("Usuario actualizado en Firestore.");
+      editStatus = false;
+      id = "";
+      btnRegistrar.innerText = "Registrarse";
     }
 
-    // Limpiar campos tras error
-    txtEmail.value = "";
-    txtPassword.value = "";
+    signUpForm.reset();
+  } catch (error) {
+    console.error("Error al registrar o guardar usuario:", error);
+    alert("Este correo ya está registrado, por favor ingrese uno nuevo.");
   }
 });
 
-// Cambiar el color del borde cuando el usuario comienza a escribir
-document.querySelector("#txt_email").addEventListener("input", () => {
-  const txtEmail = document.querySelector("#txt_email");
-  if (txtEmail.value.trim() && emailRegex.test(txtEmail.value.trim())) {
-    txtEmail.classList.add("input-valid");
-    txtEmail.classList.remove("input-invalid");
-  } else {
-    txtEmail.classList.remove("input-valid");
-    txtEmail.classList.add("input-invalid");
-  }
-});
+// Validaciones en tiempo real
+function addValidationListeners() {
+  const inputs = [
+    {
+      id: "name_usr",
+      validator: (value) => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value.trim()),
+    },
+    {
+      id: "txt_email",
+      validator: (value) => value.includes("@") && value.includes("."),
+    },
+    { id: "phone", validator: (value) => /^\d{10}$/.test(value) },
+    { id: "question", validator: (value) => value.trim().length > 0 },
+    { id: "answer", validator: (value) => value.trim().length > 0 },
+    {
+      id: "txt_password",
+      validator: (value) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=])[A-Za-z\d@$!%*?&_=]{8,16}$/.test(
+          value.trim()
+        ),
+    },
+    {
+      id: "confirm-password",
+      validator: (value) =>
+        value === signUpForm["txt_password"].value.trim(),
+    },
+  ];
 
-document.querySelector("#txt_password").addEventListener("input", () => {
-  const txtPassword = document.querySelector("#txt_password");
-  if (txtPassword.value.trim()) {
-    txtPassword.classList.add("input-valid");
-    txtPassword.classList.remove("input-invalid");
-  } else {
-    txtPassword.classList.remove("input-valid");
-    txtPassword.classList.add("input-invalid");
-  }
-});
+  inputs.forEach(({ id, validator }) => {
+    const input = document.getElementById(id);
+    input.addEventListener("input", () => {
+      if (validator(input.value)) {
+        input.classList.remove("input-invalid");
+        input.classList.add("input-valid");
+      } else {
+        input.classList.remove("input-valid");
+        input.classList.add("input-invalid");
+      }
+    });
+  });
+}
 
-
-
-
-
-
-
-// const btn_loginGoogle = document.getElementById("btn_loginGoogle");
-// btn_loginGoogle.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     const provider = new GoogleAuthProvider();
-//     signInWithPopup(auth, provider)
-//         .then((result) => {
-//             const user = result.user;
-//             document.location.href = "products.html";
-//         })
-//         .catch((error) => {
-//             const errorMessage = error.message;
-//             console.log(errorMessage);
-//         });
-// });
-
-// const btn_loginFacebook = document.getElementById("btn_loginFacebook");
-// btn_loginFacebook.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     const provider = new FacebookAuthProvider();
-//     signInWithPopup(auth, provider)
-//         .then((result) => {
-//             const user = result.user;
-//             document.location.href = "products.html";
-//         })
-//         .catch((error) => {
-//             const errorMessage = error.message;
-//             console.log(errorMessage);
-//         });
-// });
+document.addEventListener("DOMContentLoaded", addValidationListeners);
