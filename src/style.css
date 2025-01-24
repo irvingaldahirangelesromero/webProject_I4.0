@@ -378,3 +378,11 @@ form.recover-password-form .button-group {
   flex-direction: column;
   gap: 1rem; /* Espaciado uniforme entre los botones */
 }
+
+.input-valid {
+  border: 2px solid green;
+}
+
+.input-invalid {
+  border: 2px solid red;
+}

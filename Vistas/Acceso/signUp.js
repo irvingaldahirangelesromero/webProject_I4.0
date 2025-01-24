@@ -1,156 +1,143 @@
 import { auth } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { onGetUsers, saveUser, deleteUser, getUser, updateUser } from "./firebaseU.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-const btnRegistrar = document.getElementById("btn_registrar");
-const togglePasswordButtons = document.querySelectorAll(".toggle-password");
-const signUpForm = document.getElementById("sign-up-form");
-const usersContainer = document.getElementById("users-container");
+const btnLogin = document.getElementById("btn_login");
 
-let editStatus = false;
-let id = "";
-
-// Funcionalidad para mostrar/ocultar contraseñas
-togglePasswordButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const targetInput = document.getElementById(button.dataset.target);
-    const isPassword = targetInput.type === "password";
-    targetInput.type = isPassword ? "text" : "password";
-    button.textContent = isPassword ? "🙈" : "👁";
+// Función para alternar la visibilidad de la contraseña
+document.querySelectorAll(".toggle-password").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-target");
+    const input = document.getElementById(targetId);
+    if (input.type === "password") {
+      input.type = "text";
+      btn.textContent = "🙈";
+    } else {
+      input.type = "password";
+      btn.textContent = "👁";
+    }
   });
 });
 
-// Validaciones
-function validateForm() {
-  const email = signUpForm["txt_email"].value.trim();
-  const password = signUpForm["txt_password"].value.trim();
-  const confirmPassword = signUpForm["confirm-password"].value.trim();
-  const phone = signUpForm["phone"].value.trim();
-  const question = signUpForm["question"].value.trim();
-  const answer = signUpForm["answer"].value.trim();
+// Expresión regular para validar correo
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  if (password.length < 6) {
-    alert("La contraseña debe tener al menos 6 caracteres.");
-    return false;
-  }
-
-  if (password !== confirmPassword) {
-    alert("Las contraseñas no coinciden.");
-    return false;
-  }
-
-  if (!email.includes("@")) {
-    alert("Por favor, introduce un correo electrónico válido.");
-    return false;
-  }
-
-  if (isNaN(phone) || phone.length < 8) {
-    alert("El número telefónico debe contener al menos 8 dígitos y solo números.");
-    return false;
-  }
-
-  if (!question) {
-    alert("Selecciona una pregunta secreta.");
-    return false;
-  }
-
-  if (!answer.trim()) {
-    alert("La respuesta secreta no puede estar vacía.");
-    return false;
-  }
-
-  return true;
-}
-
-// Manejo de usuarios en Firestore
-window.addEventListener("DOMContentLoaded", async () => {
-  onGetUsers((querySnapshot) => {
-    usersContainer.innerHTML = "";
-
-    querySnapshot.forEach((doc) => {
-      const user = doc.data();
-      usersContainer.innerHTML += `
-        <div class="card card-body mt-2 border-primary">
-          <h3 class="h5">${user.name}</h3>
-          <p><strong>Correo:</strong> ${user.email}</p>
-          <p><strong>Teléfono:</strong> ${user.phone}</p>
-          <p><strong>Pregunta Secreta:</strong> ${user.question}</p>
-          <p><strong>Respuesta Secreta:</strong> ${user.answer}</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-danger btn-delete" data-id="${doc.id}">🗑 Eliminar</button>
-            <button class="btn btn-secondary btn-edit" data-id="${doc.id}">🖉 Editar</button>
-          </div>
-        </div>`;
-    });
-
-    // Botones para eliminar
-    usersContainer.querySelectorAll(".btn-delete").forEach((btn) =>
-      btn.addEventListener("click", async ({ target: { dataset } }) => {
-        try {
-          await deleteUser(dataset.id);
-          alert("Usuario eliminado.");
-        } catch (error) {
-          console.error("Error al eliminar usuario:", error);
-        }
-      })
-    );
-
-    // Botones para editar
-    usersContainer.querySelectorAll(".btn-edit").forEach((btn) =>
-      btn.addEventListener("click", async (e) => {
-        try {
-          const doc = await getUser(e.target.dataset.id);
-          const user = doc.data();
-          signUpForm["name_usr"].value = user.name;
-          signUpForm["txt_email"].value = user.email;
-          signUpForm["phone"].value = user.phone;
-          signUpForm["question"].value = user.question;
-          signUpForm["answer"].value = user.answer;
-
-          editStatus = true;
-          id = doc.id;
-          btnRegistrar.innerText = "Actualizar";
-        } catch (error) {
-          console.error("Error al obtener usuario:", error);
-        }
-      })
-    );
-  });
-});
-
-// Guardar o actualizar usuario
-signUpForm.addEventListener("submit", async (e) => {
+// Validar formulario de login
+btnLogin.addEventListener("click", async (e) => {
   e.preventDefault();
 
-  if (!validateForm()) return;
+  const txtEmail = document.querySelector("#txt_email");
+  const txtPassword = document.querySelector("#txt_password");
+  const email = txtEmail.value.trim();
+  const password = txtPassword.value;
 
-  const name = signUpForm["name_usr"].value.trim();
-  const email = signUpForm["txt_email"].value.trim();
-  const password = signUpForm["txt_password"].value.trim();
-  const phone = signUpForm["phone"].value.trim();
-  const question = signUpForm["question"].value.trim();
-  const answer = signUpForm["answer"].value.trim();
+  // Validación de campos vacíos
+  let valid = true;
+
+  // Validación de correo electrónico
+  if (!email || !emailRegex.test(email)) {
+    alert("Por favor, ingrese un correo electrónico válido (debe contener '@' y un dominio).");
+    txtEmail.classList.add("input-invalid");
+    valid = false;
+  } else {
+    txtEmail.classList.remove("input-invalid");
+    txtEmail.classList.add("input-valid");
+  }
+
+  // Validación de contraseña
+  if (!password) {
+    alert("Por favor, ingrese una contraseña.");
+    txtPassword.classList.add("input-invalid");
+    valid = false;
+  } else {
+    txtPassword.classList.remove("input-invalid");
+    txtPassword.classList.add("input-valid");
+  }
+
+  // Si los campos no son válidos, detenemos el proceso
+  if (!valid) {
+    return;
+  }
 
   try {
-    if (!editStatus) {
-      // Registro en Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+    // Intentar iniciar sesión
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    alert("Inicio de sesión exitoso.");
+    window.location.href = "/Vistas/Admin/products.html";
+  } catch (error) {
+    // Manejo de errores de Firebase
+    const errorCode = error.code;
+    const errorMessage = error.message;
 
-      // Guardar en Firestore
-      await saveUser(name, email, phone, question, answer);
-      alert("Usuario registrado exitosamente.");
+    if (errorCode === "auth/user-not-found" || errorCode === "auth/wrong-password") {
+      alert("Correo o contraseña incorrectos. Por favor, inténtelo nuevamente.");
+      txtEmail.classList.add("input-invalid");
+      txtPassword.classList.add("input-invalid");
     } else {
-      await updateUser(id, { name, email, phone, question, answer });
-      alert("Usuario actualizado en Firestore.");
-      editStatus = false;
-      id = "";
-      btnRegistrar.innerText = "Registrarse";
+      alert(`Error al iniciar sesión: ${errorMessage}`);
     }
 
-    signUpForm.reset();
-  } catch (error) {
-    console.error("Error al registrar o guardar usuario:", error);
-    alert("Este correo ya esta registrado, Por favor ingrese uno nuevo.");
+    // Limpiar campos tras error
+    txtEmail.value = "";
+    txtPassword.value = "";
   }
 });
+
+// Cambiar el color del borde cuando el usuario comienza a escribir
+document.querySelector("#txt_email").addEventListener("input", () => {
+  const txtEmail = document.querySelector("#txt_email");
+  if (txtEmail.value.trim() && emailRegex.test(txtEmail.value.trim())) {
+    txtEmail.classList.add("input-valid");
+    txtEmail.classList.remove("input-invalid");
+  } else {
+    txtEmail.classList.remove("input-valid");
+    txtEmail.classList.add("input-invalid");
+  }
+});
+
+document.querySelector("#txt_password").addEventListener("input", () => {
+  const txtPassword = document.querySelector("#txt_password");
+  if (txtPassword.value.trim()) {
+    txtPassword.classList.add("input-valid");
+    txtPassword.classList.remove("input-invalid");
+  } else {
+    txtPassword.classList.remove("input-valid");
+    txtPassword.classList.add("input-invalid");
+  }
+});
+
+
+
+
+
+
+
+// const btn_loginGoogle = document.getElementById("btn_loginGoogle");
+// btn_loginGoogle.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     const provider = new GoogleAuthProvider();
+//     signInWithPopup(auth, provider)
+//         .then((result) => {
+//             const user = result.user;
+//             document.location.href = "products.html";
+//         })
+//         .catch((error) => {
+//             const errorMessage = error.message;
+//             console.log(errorMessage);
+//         });
+// });
+
+// const btn_loginFacebook = document.getElementById("btn_loginFacebook");
+// btn_loginFacebook.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     const provider = new FacebookAuthProvider();
+//     signInWithPopup(auth, provider)
+//         .then((result) => {
+//             const user = result.user;
+//             document.location.href = "products.html";
+//         })
+//         .catch((error) => {
+//             const errorMessage = error.message;
+//             console.log(errorMessage);
+//         });
+// });
