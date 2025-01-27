@@ -44,8 +44,9 @@ function validateForm() {
   }
 
   // Validar contraseña
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=])[A-Za-z\d@$!%*?&_=]{8,16}$/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=#])[A-Za-z\d@$!%*?&_=#]{8,16}$/;
+
   if (!passwordRegex.test(password)) {
     alert(
       "La contraseña debe tener entre 8 y 16 caracteres, al menos una letra minúscula, una letra mayúscula, un número y un carácter especial."
@@ -166,6 +167,7 @@ signUpForm.addEventListener("submit", async (e) => {
       // Guardar en Firestore
       await saveUser(name, email, phone, question, answer, role);
       alert("Usuario registrado exitosamente.");
+      
     } else {
       await updateUser(id, { name, email, phone, question, answer, role});
       alert("Usuario actualizado en Firestore.");
