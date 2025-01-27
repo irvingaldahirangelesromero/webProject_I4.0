@@ -35,9 +35,11 @@
   <!-- Header y Footer se incluirán dinámicamente -->
   <div id="header-footer"></div>
 
+  <form action="#" id="sign-up-form" style="display: inline;">
+
   <main>
     <h2>Registro</h2>
-    <form action="#" id="sign-up-form">
+    <div>
       <label for="name_usr">Nombre:</label>
       <input type="text" id="name_usr" placeholder="Ingresa tu nombre" autocomplete="off" required>
       <ul id="name-validation" class="validation-messages">
@@ -46,14 +48,14 @@
         <li>El nombre no debe exceder los 60 caracteres.</li>
         <li>El campo no puede quedar vacío.</li>
       </ul>
-
+      
       <label for="txt_email">Correo Electrónico:</label>
       <input type="email" id="txt_email" placeholder="ejemplo@correo.com" autocomplete="off" required>
-      <ul id="email-validation" class="validation-messages" >
+      <ul id="email-validation" class="validation-messages">
         <li>Formato incorrecto</li>
         <li>El campo no puede quedar vacío.</li>
       </ul>
-
+      
       <label for="phone">Número Telefónico:</label>
       <input type="tel" id="phone" placeholder="Ingresa tu número telefónico" autocomplete="off" required>
       <ul id="phone-validation" class="validation-messages">
@@ -62,53 +64,54 @@
         <li>El número no debe exceder los 15 caracteres.</li>
         <li>El campo no puede quedar vacío.</li>
       </ul>
-
-      <label for="question">Pregunta Secreta:</label>
-      <select id="question" required>
-        <option value="">Seleccione una pregunta</option>
-        <option value="pet">¿Nombre de tu primera mascota?</option>
-        <option value="school">¿Nombre de tu escuela primaria?</option>
-        <option value="city">¿Ciudad donde naciste?</option>
-        <option value="food">¿Cuál es tu comida favorita?</option>
-        <option value="movie">¿Cuál es tu película favorita?</option>
-      </select>
-      <ul id="question-validation"  class="validation-messages">
-        <li>Debe seleccionar una opción válida.</li>
-      </ul>
-
-      <label for="answer">Respuesta Secreta:</label>
-      <input type="text" id="answer" placeholder="Ingresa tu respuesta secreta" autocomplete="off" required>
-      <ul id="answer-validation" class="validation-messages">
-        <li>El nombre no debe contener números.</li>
-        <li>El nombre no debe contener símbolos.</li>
-        <li>El nombre no debe exceder los 60 caracteres.</li>
-        <li>El campo no puede quedar vacío.</li>
-      </ul>
-
-      <label for="txt_password">Contraseña:</label>
-      <div class="password-container">
-        <input type="password" id="txt_password"  placeholder="Ingresa tu contraseña" autocomplete="off" required>
-        <button type="button" class="toggle-password" data-target="txt_password">👁</button>
-      </div>
-      <ul id="password-validation" class="validation-messages">
-        <li>Debe tener al menos 8 caracteres.</li>
-        <li>Debe tener al menos un caracter especial: ! # $ % & * + - / ?</li>
-        <li>Debe contener al menos una letra mayúscula.</li>
-        <li>Debe contener al menos una letra minúscula.</li>
-        <li>Debe contener al menos un número.</li>
-        <li>El campo no puede quedar vacío.</li>
-      </ul>
-
-      <label for="confirm-password" >Confirmar Contraseña:</label>
-      <div class="password-container">
-        <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" required autocomplete="off">
-        <button type="button" class="toggle-password" data-target="confirm-password">👁</button>
-      </div>
-      <ul id="confirm-password-validation" class="validation-messages">
-        <li>La contraseña debe coincidir con el campo anterior.</li>
-        <li>El campo no puede quedar vacío.</li>
-      </ul>
-
+    </div>
+    <div>
+  <label for="question">Pregunta Secreta:</label>
+  <select id="question" required>
+    <option value="">Seleccione una pregunta</option>
+    <option value="pet">¿Nombre de tu primera mascota?</option>
+    <option value="school">¿Nombre de tu escuela primaria?</option>
+    <option value="city">¿Ciudad donde naciste?</option>
+    <option value="food">¿Cuál es tu comida favorita?</option>
+    <option value="movie">¿Cuál es tu película favorita?</option>
+  </select>
+  <ul id="question-validation" class="validation-messages">
+    <li>Debe seleccionar una opción válida.</li>
+  </ul>
+  
+  <label for="answer">Respuesta Secreta:</label>
+  <input type="text" id="answer" placeholder="Ingresa tu respuesta secreta" autocomplete="off" required>
+  <ul id="answer-validation" class="validation-messages">
+    <li>El nombre no debe contener números.</li>
+    <li>El nombre no debe contener símbolos.</li>
+    <li>El nombre no debe exceder los 60 caracteres.</li>
+    <li>El campo no puede quedar vacío.</li>
+  </ul>
+  
+  <label for="txt_password">Contraseña:</label>
+  <div class="password-container">
+    <input type="password" id="txt_password" placeholder="Ingresa tu contraseña" autocomplete="off" required>
+    <button type="button" class="toggle-password" data-target="txt_password">👁</button>
+  </div>
+  <ul id="password-validation" class="validation-messages">
+    <li>Debe tener al menos 8 caracteres.</li>
+    <li>Debe tener al menos un caracter especial: ! # $ % & * + - / ?</li>
+    <li>Debe contener al menos una letra mayúscula.</li>
+    <li>Debe contener al menos una letra minúscula.</li>
+    <li>Debe contener al menos un número.</li>
+    <li>El campo no puede quedar vacío.</li>
+  </ul>
+  
+  <label for="confirm-password">Confirmar Contraseña:</label>
+  <div class="password-container">
+    <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" required autocomplete="off">
+    <button type="button" class="toggle-password" data-target="confirm-password">👁</button>
+  </div>
+  <ul id="confirm-password-validation" class="validation-messages">
+    <li>La contraseña debe coincidir con el campo anterior.</li>
+    <li>El campo no puede quedar vacío.</li>
+  </ul>
+    </div>
       <button type="submit" id="btn_registrar" disabled>Registrarse</button>
     </form>
 

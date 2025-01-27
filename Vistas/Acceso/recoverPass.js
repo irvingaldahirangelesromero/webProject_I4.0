@@ -1,4 +1,3 @@
-
 import { auth } from "./firebase.js"; // Firebase Auth
 import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -64,20 +63,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         btnConfirmVerification.addEventListener('click', async (event) => {
             event.preventDefault();
 
-            const question = document.getElementById('securityQuestion').value;
             const answer = document.getElementById('answer').value.trim();
 
-            if (!question || !answer) {
-                alert("Por favor, completa todos los campos.");
+            if (!answer) {
+                alert("Por favor, ingresa tu respuesta.");
                 return;
             }
 
             try {
                 console.log("Consultando Firestore con los datos:");
-                console.log(`Email: ${email}, Question: ${question}, Answer: ${answer}`);
+                console.log(`Email: ${email}, Answer: ${answer}`);
 
                 const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", "==", email), where("question", "==", question), where("answer", "==", answer));
+                const q = query(usersRef, where("email", "==", email), where("answer", "==", answer));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
@@ -86,8 +84,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     alert("Se ha enviado un correo de restablecimiento de contraseña.");
                     window.location.href = "../../index.html";
                 } else {
-                    console.warn("Usuario no encontrado o los datos no coinciden.");
-                    alert("La pregunta y respuesta no coinciden con la información registrada.");
+                    console.warn("Usuario no encontrado o la respuesta no coincide.");
+                    alert("La respuesta no coincide con la información registrada.");
                 }
             } catch (error) {
                 console.error("Error al verificar las preguntas de seguridad:", error);
