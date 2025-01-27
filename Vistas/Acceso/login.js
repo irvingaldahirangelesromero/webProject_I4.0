@@ -1,7 +1,9 @@
 import { auth } from "./firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const btnLogin = document.getElementById("btn_login");
+const db = getFirestore(); // Inicializar Firestore
 
 // Función para alternar la visibilidad de la contraseña
 document.querySelectorAll(".toggle-password").forEach((btn) => {
@@ -27,7 +29,7 @@ btnLogin.addEventListener("click", async (e) => {
 
   const txtEmail = document.querySelector("#txt_email");
   const txtPassword = document.querySelector("#txt_password");
-  const email = txtEmail.value.trim();
+  const email = txtEmail.value.trim().toLowerCase(); // Convertir a minúsculas para evitar problemas
   const password = txtPassword.value;
 
   // Validación de campos vacíos
@@ -62,8 +64,31 @@ btnLogin.addEventListener("click", async (e) => {
     // Intentar iniciar sesión
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    alert("Inicio de sesión exitoso.");
-    window.location.href = "/Vistas/Admin/products.html";
+
+    // Consulta para obtener el rol del usuario desde Firestore
+    const usersCollection = collection(db, "users"); // Cambia "users" por tu colección
+    const q = query(usersCollection, where("email", "==", email)); // Busca el documento con el correo
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      // Itera sobre los documentos encontrados
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data();
+        const role = userData.role; // Suponiendo que "role" contiene el rol del usuario
+
+        if (role === "Admin") {
+          alert("Inicio de sesión exitoso como Administrador.");
+          window.location.href = "/Vistas/Admin/products.html";
+        } else if (role === "Cliente") {
+          alert("Inicio de sesión exitoso como Cliente.");
+          window.location.href = "/Vistas/Cliente/products.html";
+        } else {
+          alert("Rol no reconocido. Contacte al administrador.");
+        }
+      });
+    } else {
+      alert("No se encontró información del usuario con este correo en Firestore.");
+    }
   } catch (error) {
     // Manejo de errores de Firebase
     const errorCode = error.code;
@@ -105,39 +130,3 @@ document.querySelector("#txt_password").addEventListener("input", () => {
     txtPassword.classList.add("input-invalid");
   }
 });
-
-
-
-
-
-
-
-// const btn_loginGoogle = document.getElementById("btn_loginGoogle");
-// btn_loginGoogle.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     const provider = new GoogleAuthProvider();
-//     signInWithPopup(auth, provider)
-//         .then((result) => {
-//             const user = result.user;
-//             document.location.href = "products.html";
-//         })
-//         .catch((error) => {
-//             const errorMessage = error.message;
-//             console.log(errorMessage);
-//         });
-// });
-
-// const btn_loginFacebook = document.getElementById("btn_loginFacebook");
-// btn_loginFacebook.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     const provider = new FacebookAuthProvider();
-//     signInWithPopup(auth, provider)
-//         .then((result) => {
-//             const user = result.user;
-//             document.location.href = "products.html";
-//         })
-//         .catch((error) => {
-//             const errorMessage = error.message;
-//             console.log(errorMessage);
-//         });
-// });

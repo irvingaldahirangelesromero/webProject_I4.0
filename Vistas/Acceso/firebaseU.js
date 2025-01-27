@@ -22,8 +22,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore();
 
-export const saveUser = (name, email, phone, question, answer) =>
-  addDoc(collection(db, "users"), { name, email, phone, question, answer });
+export const saveUser = (name, email, phone, question, answer, role) =>
+  addDoc(collection(db, "users"), { name, email, phone, question, answer, role});
 
 export const onGetUsers = (callback) =>
   onSnapshot(collection(db, "users"), callback);
