@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             try {
                 await sendPasswordResetEmail(auth, email);
                 alert("Se ha enviado un correo de restablecimiento de contraseña.");
-                window.location.href = "../../index.html";
+                window.location.href = "../Acceso/login.html";
             } catch (error) {
                 handleAuthError(error);
             }
@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!querySnapshot.empty) {
                     console.log("Usuario encontrado. Enviando correo de recuperación...");
                     await sendPasswordResetEmail(auth, email);
+                    window.location.href = "../Acceso/login.html";
                     alert("Se ha enviado un correo de restablecimiento de contraseña.");
-                    window.location.href = "../../index.html";
                 } else {
                     console.warn("Usuario no encontrado o la respuesta no coincide.");
                     alert("La respuesta no coincide con la información registrada.");
