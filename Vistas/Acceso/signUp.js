@@ -167,7 +167,7 @@ signUpForm.addEventListener("submit", async (e) => {
       // Guardar en Firestore
       await saveUser(name, email, phone, question, answer, role);
       alert("Usuario registrado exitosamente.");
-      
+      window.location.href = "../Cliente/products.html";  // Redirigir al login
     } else {
       await updateUser(id, { name, email, phone, question, answer, role});
       alert("Usuario actualizado en Firestore.");
