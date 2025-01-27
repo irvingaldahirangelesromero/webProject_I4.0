@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Productos</title>
+    <link rel="stylesheet" href="/src/styles2.css"></head>
+<body>
+    <header class="header">
+        <h1>Tienda de Productos</h1>
+        <div id="user-info">
+            <span id="user-name">Bienvenido, <span id="user-display"></span></span>
+            <button id="btn_logout" class="btn btn-secondary">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav-bar">
+            <div class="categories">
+                <ul id="category-list"></ul>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search" placeholder="Buscar productos por nombre..." oninput="searchProducts()" />
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <div id="product-list" class="product-list"></div>
+            <div id="sidebar" class="sidebar">
+                <h2 id="product-title">Detalles del Producto</h2>
+                <p><strong>Categoría:</strong> <span id="product-category"></span></p>
+                <p><strong>Descripción:</strong> <span id="product-description"></span></p>
+                <p><strong>Precio:</strong> $<span id="product-price"></span></p>
+            </div>
+        </div>
+    </div>
+    <script src="/Vistas/Cliente/products.js"></script>
+</body>
+</html>

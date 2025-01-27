@@ -155,6 +155,7 @@ signUpForm.addEventListener("submit", async (e) => {
   const phone = signUpForm["phone"].value.trim();
   const question = signUpForm["question"].value.trim();
   const answer = signUpForm["answer"].value.trim();
+  const role = "Cliente";
 
   try {
     if (!editStatus) {
@@ -163,10 +164,10 @@ signUpForm.addEventListener("submit", async (e) => {
       const user = userCredential.user;
 
       // Guardar en Firestore
-      await saveUser(name, email, phone, question, answer);
+      await saveUser(name, email, phone, question, answer, role);
       alert("Usuario registrado exitosamente.");
     } else {
-      await updateUser(id, { name, email, phone, question, answer });
+      await updateUser(id, { name, email, phone, question, answer, role});
       alert("Usuario actualizado en Firestore.");
       editStatus = false;
       id = "";
