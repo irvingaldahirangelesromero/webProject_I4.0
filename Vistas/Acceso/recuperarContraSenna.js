@@ -1,64 +1,46 @@
-const passwordInput = document.getElementById('txt_password');
-const confirmPasswordInput = document.getElementById('confirm-password');
+import { auth } from "./firebase.js";
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
+document.addEventListener("DOMContentLoaded", () => {
+  const passwordInput = document.getElementById("txt_password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+  const passwordValidationList = document.getElementById("password-validation");
+  const confirmPasswordValidationList = document.getElementById("confirm-password-validation");
+  const submitButton = document.getElementById("btn_registrar");
 
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-    document.getElementById('header-footer').innerHTML = `
-        ${await (await fetch("../../header-footer.html")).text()}
-    `;
-});
-    
-
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById('sign-up-form');
-
-
-const validationMessages = {
-    password: document.getElementById('password-validation'),
-    confirmPassword: document.getElementById('confirm-password-validation'),
-};
-
-
-function checkPassword() {
+  function validatePassword() {
     const password = passwordInput.value;
-    const messages = [];
-    if (password.length === 0) messages.push("El campo no puede quedar vacío.");
-    if (password.length < 8) messages.push("Debe tener al menos 8 caracteres.");
-    if (!/[!#$%&*+\-/?]/.test(password)) messages.push("Debe tener al menos un caracter especial: ! # $ % & * + - / ?");
-    if (!/[A-Z]/.test(password)) messages.push("Debe contener al menos una letra mayúscula.");
-    if (!/[a-z]/.test(password)) messages.push("Debe contener al menos una letra minúscula.");
-    if (!/\d/.test(password)) messages.push("Debe contener al menos un número.");
-
-    toggleValidation(passwordInput, validationMessages.password, messages);
-}
-
-function checkConfirmPassword() {
     const confirmPassword = confirmPasswordInput.value;
-    const messages = [];
-    if (confirmPassword.length === 0) messages.push("El campo no puede quedar vacío.");
-    if (confirmPassword !== passwordInput.value) messages.push("La contraseña debe coincidir con el campo anterior.");
-    toggleValidation(confirmPasswordInput, validationMessages.confirmPassword, messages);
-}
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=#])[A-Za-z\d@$!%*?&_=#]{8,16}$/;
+    
+    let isValid = passwordRegex.test(password);
+    passwordValidationList.style.display = isValid ? "none" : "block";
+    confirmPasswordValidationList.style.display = password === confirmPassword && password ? "none" : "block";
+    
+    submitButton.disabled = !(isValid && password === confirmPassword);
+  }
 
-    // Función que alterna los mensajes y los estilos según la validación
-    function toggleValidation(inputElement, messageElement, messages) {
-      if (messages.length > 0) {
-        inputElement.classList.add('input-invalid');
-        messageElement.style.display = 'block';
-        messageElement.innerHTML = messages.map(msg => `<li>${msg}</li>`).join('');
-      } else {
-        inputElement.classList.remove('input-invalid');
-        inputElement.classList.add('input-valid');
-        messageElement.style.display = 'none';
-      }
+  passwordInput.addEventListener("input", validatePassword);
+  confirmPasswordInput.addEventListener("input", validatePassword);
+
+  document.getElementById("sign-up-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    const newPassword = passwordInput.value;
+    
+    if (!user) {
+      alert("No hay usuario autenticado.");
+      return;
     }
 
-    passwordInput.addEventListener('blur', checkPassword);
-    confirmPasswordInput.addEventListener('blur', checkConfirmPassword);
-
+    try {
+      await updatePassword(user, newPassword);
+      alert("Contraseña actualizada con éxito.");
+      window.location.href = "../Cliente/products.html";
+    } catch (error) {
+      console.error("Error al actualizar la contraseña:", error);
+      alert("Hubo un error al actualizar la contraseña. Inténtalo de nuevo.");
+    }
   });
+});
