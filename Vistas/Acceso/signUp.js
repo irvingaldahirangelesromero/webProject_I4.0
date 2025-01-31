@@ -194,7 +194,7 @@ function addValidationListeners() {
       id: "txt_email",
       validator: (value) => value.includes("@") && value.includes("."),
     },
-    { id: "phone", validator: (value) => /^\d{10}$/.test(value) },
+    { id: "phone", validator: (value) => value.trim().length >= 10 && value.trim().length <=10 && /^\d{10}$/.test(value) },
     { id: "question", validator: (value) => value.trim().length > 0 },
     { id: "answer", validator: (value) => value.trim().length > 0 },
     {
