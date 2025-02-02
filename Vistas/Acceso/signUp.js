@@ -20,74 +20,6 @@ togglePasswordButtons.forEach((button) => {
   });
 });
 
-// Validaciones
-function validateForm() {
-  const name = signUpForm["name_usr"].value.trim();
-  const email = signUpForm["txt_email"].value.trim();
-  const password = signUpForm["txt_password"].value.trim();
-  const confirmPassword = signUpForm["confirm-password"].value.trim();
-  const phone = signUpForm["phone"].value.trim();
-  const question = signUpForm["question"].value.trim();
-  const answer = signUpForm["answer"].value.trim();
-
-  // Validar campos vacíos
-  if (!name || !email || !password || !confirmPassword) {
-    alert("Por favor, complete todos los campos.");
-    return false;
-  }
-
-  // Validar nombre (solo letras)
-  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-  if (!nameRegex.test(name)) {
-    alert("El nombre solo debe contener letras.");
-    return false;
-  }
-
-  // Validar contraseña
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=#])[A-Za-z\d@$!%*?&_=#]{8,16}$/;
-
-  if (!passwordRegex.test(password)) {
-    alert(
-      "La contraseña debe tener entre 8 y 16 caracteres, al menos una letra minúscula, una letra mayúscula, un número y un carácter especial."
-    );
-    return false;
-  }
-
-  // Validar confirmación de contraseña
-  if (password !== confirmPassword) {
-    alert("Las contraseñas no son iguales.");
-    return false;
-  }
-
-  // Validar email
-  if (!email.includes("@") || !email.includes(".")) {
-    alert("Por favor, introduce un correo electrónico válido.");
-    return false;
-  }
-
-  // Validar teléfono
-  const phoneRegex = /^\d{10}$/;
-  if (!phoneRegex.test(phone)) {
-    alert("El número telefónico debe contener exactamente 10 dígitos.");
-    return false;
-  }
-
-  // Validar pregunta secreta
-  if (!question) {
-    alert("Selecciona una pregunta secreta.");
-    return false;
-  }
-
-  // Validar respuesta secreta
-  if (!answer.trim()) {
-    alert("La respuesta secreta no puede estar vacía.");
-    return false;
-  }
-
-  return true;
-}
-
 // Manejo de usuarios en Firestore
 window.addEventListener("DOMContentLoaded", async () => {
   onGetUsers((querySnapshot) => {
@@ -194,7 +126,7 @@ function addValidationListeners() {
       id: "txt_email",
       validator: (value) => value.includes("@") && value.includes("."),
     },
-    { id: "phone", validator: (value) => value.trim().length >= 10 && value.trim().length <=10 && /^\d{10}$/.test(value) },
+    { id: "phone", validator: (value) => value.trim().length >= 10 && value.trim().length <11 && /^\d{10}$/.test(value) },
     { id: "question", validator: (value) => value.trim().length > 0 },
     { id: "answer", validator: (value) => value.trim().length > 0 },
     {

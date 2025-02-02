@@ -112,7 +112,7 @@
           <li>El campo no puede quedar vacío.</li>
         </ul>
       </div>
-      <button type="submit" id="btn_registrar" disabled>Registrarse</button>
+      <button type="submit" id="btn_registrar" >Registrarse</button>
   </form>
 
   </main>
@@ -163,7 +163,7 @@
         const messages = [];
         if (email.length === 0) messages.push("El campo no puede quedar vacío.");
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) messages.push("Formato incorrecto.");
+        if (!emailPattern.test(email)) messages.push("El correo debe tener el formato ejemplo@correo.com");
 
         toggleValidation(emailInput, validationMessages.email, messages);
       }
@@ -173,9 +173,8 @@
         const messages = [];
         if (phone.length === 0) messages.push("El campo no puede quedar vacío.");
         if (/[a-zA-Z]/.test(phone)) messages.push("El número no debe contener letras.");
-        if (phone.length > 15) messages.push("El número no debe exceder los 15 caracteres.");
+        if (phone.length != 10 ) messages.push("El número telefonico debe contener 10 digitos.");
         const phonePattern = /^\+?\d+$/;
-        if (!phonePattern.test(phone)) messages.push("El número solo puede contener un símbolo '+' al inicio.");
 
         toggleValidation(phoneInput, validationMessages.phone, messages);
       }
@@ -252,10 +251,14 @@
       confirmPasswordInput.addEventListener('blur', checkConfirmPassword);
 
       // Función para habilitar el botón de envío solo si todos los campos son válidos
-      form.addEventListener('input', function () {
-        const isValid = [...form.querySelectorAll('input, select')].every(input => input.classList.contains('input-valid'));
-        document.getElementById('btn_registrar').disabled = !isValid;
-      });
+      function validarQueNingunCampoSeaVacio(){
+        if(nameInput.value.length === 0 || emailInput.value.length === 0 || phoneInput.value.length === 0 || questionSelect.value.length === 0 || answerInput.value.length === 0 || passwordInput.value.length === 0 || confirmPasswordInput.value.length === 0){
+          alert("Ningún campo puede quedar vacío.");
+          return false;
+        }
+        return true;
+      }
+
     });
 
   </script>
