@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             await loadSecurityQuestionsForm();
         });
     }
-
+    
     async function loadSecurityQuestionsForm() {
         contentForms.innerHTML = await (await fetch("frmSecurityQuestions.html")).text();
 
@@ -59,6 +59,31 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "recoverPass.html";
             return;
         }
+
+        
+        try {
+        // Consultar Firestore para obtener la pregunta de seguridad del usuario
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const userData = querySnapshot.docs[0].data();
+            const question = userData.securityQuestion; // Asegúrate de que la clave en Firestore sea correcta
+
+            // Mostrar la pregunta en el formulario
+            document.getElementById('QuestionSelected').textContent = question;
+        } else {
+            alert("No se encontró un usuario con este correo.");
+            window.location.href = "recoverPass.html";
+        }
+    } catch (error) {
+        console.error("Error al obtener la pregunta de seguridad:", error);
+        alert("Hubo un problema al recuperar la pregunta de seguridad. Inténtalo de nuevo.");
+    }
+
+        
+        
 
         btnConfirmVerification.addEventListener('click', async (event) => {
             event.preventDefault();

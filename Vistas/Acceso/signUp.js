@@ -80,7 +80,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (!validateForm()) return;
+
 
   const name = signUpForm["name_usr"].value.trim();
   const email = signUpForm["txt_email"].value.trim();
