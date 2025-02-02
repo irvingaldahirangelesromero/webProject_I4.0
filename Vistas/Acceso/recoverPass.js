@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!querySnapshot.empty) {
             const userData = querySnapshot.docs[0].data();
-            const question = userData.securityQuestion; // Asegúrate de que la clave en Firestore sea correcta
+            const question = userData.question; // Asegúrate de que la clave en Firestore sea correcta
 
             // Mostrar la pregunta en el formulario
             document.getElementById('QuestionSelected').textContent = question;
