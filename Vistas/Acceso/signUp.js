@@ -86,7 +86,8 @@ signUpForm.addEventListener("submit", async (e) => {
   const email = signUpForm["txt_email"].value.trim();
   const password = signUpForm["txt_password"].value.trim();
   const phone = signUpForm["phone"].value.trim();
-  const question = signUpForm["question"].value.trim();
+  //const question = signUpForm["question"].value.trim();
+  const question = signUpForm["question"].options[signUpForm["question"].selectedIndex].text.trim();
   const answer = signUpForm["answer"].value.trim();
   const role = "Cliente";
 
