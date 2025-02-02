@@ -11,11 +11,11 @@
             border: 2px solid green;
             background-color: rgb(208, 255, 208);
         }
-    
+
         .input-invalid {
             border: 2px solid red;
         }
-    
+
         .validation-messages {
             color: red;
             font-size: 0.9em;
@@ -23,7 +23,7 @@
             margin-left: 20px;
             display: none;
         }
-    
+
         .password-container {
             display: flex;
             align-items: center;
@@ -34,46 +34,114 @@
 <body>
     <div id="header-footer"></div>
 
-    <form action="#" id="sign-up-form" style="display: inline;">
+    <form action="#" id="reset-password-form" style="display: inline;">
         <main>
             <h2>Renicializar contraseña</h2>
-                <label for="txt_password">Ingresa tu nueva contraseña:</label>
-                <div class="password-container">
-                    <input type="password" id="txt_password" placeholder="Ingresa tu contraseña" autocomplete="off"
-                        required>
-                    <button type="button" class="toggle-password" data-target="txt_password">👁</button>
-                </div>
-                <ul id="password-validation" class="validation-messages">
-                    <li>Debe tener al menos 8 caracteres.</li>
-                    <li>Debe tener al menos un caracter especial: ! # $ % & * + - / ?</li>
-                    <li>Debe contener al menos una letra mayúscula.</li>
-                    <li>Debe contener al menos una letra minúscula.</li>
-                    <li>Debe contener al menos un número.</li>
-                    <li>El campo no puede quedar vacío.</li>
-                </ul>
-
-                <label for="confirm-password">Confirmar Contraseña:</label>
-                <div class="password-container">
-                    <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" required
-                        autocomplete="off">
-                    <button type="button" class="toggle-password" data-target="confirm-password">👁</button>
-                </div>
-                <ul id="confirm-password-validation" class="validation-messages">
-                    <li>La contraseña debe coincidir con el campo anterior.</li>
-                    <li>El campo no puede quedar vacío.</li>
-                </ul>
-            
+            <label for="txt_password">Ingresa tu nueva contraseña:</label>
+            <div class="password-container">
+                <input type="password" id="txt_password" placeholder="Ingresa tu contraseña" autocomplete="off"
+                    required>
+                <button type="button" class="toggle-password" data-target="txt_password">👁</button>
             </div>
-            <button type="submit" id="btn_registrar" disabled>Guardar</button>
+            <ul id="password-validation" class="validation-messages"></ul>
+
+            <label for="confirm-password">Confirmar Contraseña:</label>
+            <div class="password-container">
+                <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" required 
+                    autocomplete="off">
+                <button type="button" class="toggle-password" data-target="confirm-password">👁</button>
+            </div>
+            <ul id="confirm-password-validation" class="validation-messages"></ul>
+
+            <button type="submit" id="btn_guardar" >Guardar</button>
     </form>
-
     </main>
-
-    <script type="module" src="recuperarContraSenna.js"></script>
-    <script>
-
-
-    </script>
 </body>
+
+<script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            document.getElementById('header-footer').innerHTML = `
+        ${await (await fetch("../../header-footer.html")).text()}
+      `;
+        });
+        // Función para alternar la visibilidad de la contraseña
+            document.querySelectorAll(".toggle-password").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const targetId = btn.getAttribute("data-target");
+                    const input = document.getElementById(targetId);
+                    if (input.type === "password") {
+                        input.type = "text";
+                        btn.textContent = "🙈";
+                    } else {
+                        input.type = "password";
+                        btn.textContent = "👁";
+                    }
+                });
+            });
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById('sign-up-form');
+
+            // Obtener todos los elementos de entrada y validaciones
+            const passwordInput = document.getElementById('txt_password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+
+            const validationMessages = {
+                password: document.getElementById('password-validation'),
+                confirmPassword: document.getElementById('confirm-password-validation'),
+            };
+
+            // Función para comprobar las validaciones de cada campo
+
+            function checkPassword() {
+                const password = passwordInput.value;
+                const messages = [];
+                if (password.length === 0) messages.push("El campo no puede quedar vacío.");
+                if (password.length < 8) messages.push("Debe tener al menos 8 caracteres.");
+                if (!/[!#$%&*+\-/?]/.test(password)) messages.push("Debe tener al menos un caracter especial: ! # $ % & * + - / ?");
+                if (!/[A-Z]/.test(password)) messages.push("Debe contener al menos una letra mayúscula.");
+                if (!/[a-z]/.test(password)) messages.push("Debe contener al menos una letra minúscula.");
+                if (!/\d/.test(password)) messages.push("Debe contener al menos un número.");
+
+                toggleValidation(passwordInput, validationMessages.password, messages);
+            }
+
+            function checkConfirmPassword() {
+                const confirmPassword = confirmPasswordInput.value;
+                const messages = [];
+                if (confirmPassword.length === 0) messages.push("El campo no puede quedar vacío.");
+                if (confirmPassword !== passwordInput.value) messages.push("La contraseña debe coincidir con el campo anterior.");
+
+                toggleValidation(confirmPasswordInput, validationMessages.confirmPassword, messages);
+            }
+
+            // Función que alterna los mensajes y los estilos según la validación
+            function toggleValidation(inputElement, messageElement, messages) {
+                if (messages.length > 0) {
+                    inputElement.classList.add('input-invalid');
+                    messageElement.style.display = 'block';
+                    messageElement.innerHTML = messages.map(msg => `<li>${msg}</li>`).join('');
+                } else {
+                    inputElement.classList.remove('input-invalid');
+                    inputElement.classList.add('input-valid');
+                    messageElement.style.display = 'none';
+                }
+            }
+
+            // Agregar event listeners para validar en tiempo real
+            passwordInput.addEventListener('blur', checkPassword);
+            confirmPasswordInput.addEventListener('blur', checkConfirmPassword);
+
+            // Función para habilitar el botón de envío solo si todos los campos son válidos
+            function validarQueNingunCampoSeaVacio() {
+                if (passwordInput.value.length === 0 || confirmPasswordInput.value.length === 0) {
+                    alert("Ningún campo puede quedar vacío.");
+                    return false;
+                }
+                return true;
+            }
+
+        });
+
+</script>
 
 </html>
