@@ -20,8 +20,9 @@ togglePasswordButtons.forEach((button) => {
   });
 });
 
+
 // Manejo de usuarios en Firestore
-window.addEventListener("DOMContentLoaded", async () => {
+/*window.addEventListener("DOMContentLoaded", async () => {
   onGetUsers((querySnapshot) => {
     usersContainer.innerHTML = "";
 
@@ -74,46 +75,88 @@ window.addEventListener("DOMContentLoaded", async () => {
       })
     );
   });
-});
+});*/
+
+function validarQueNingunCampoSeaVacio() {
+  const inputs = [
+    document.getElementById('name_usr'),
+    document.getElementById('txt_email'),
+    document.getElementById('phone'),
+    document.getElementById('answer'),
+    document.getElementById('txt_password'),
+    document.getElementById('confirm-password')
+  ];
+  
+  let isValid = true;
+  
+  inputs.forEach(input => {
+    if (input.value.trim() === "") {
+      input.classList.add('input-invalid');
+      isValid = false;
+    }
+  });
+
+  if (!isValid) alert("Todos los campos son obligatorios");
+  return isValid;
+}
 
 // Guardar o actualizar usuario
 signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-
-
+  // Obtener todos los valores necesarios
   const name = signUpForm["name_usr"].value.trim();
   const email = signUpForm["txt_email"].value.trim();
   const password = signUpForm["txt_password"].value.trim();
   const phone = signUpForm["phone"].value.trim();
-  const question = signUpForm["question"].value.trim();
+  const question = signUpForm["question"].options[signUpForm["question"].selectedIndex].text.trim();
   const answer = signUpForm["answer"].value.trim();
   const role = "Cliente";
 
-  try {
-    if (!editStatus) {
-      // Registro en Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  // Validaciones básicas antes de verificar existencia
+  if (!validarQueNingunCampoSeaVacio()) return;
 
-      // Guardar en Firestore
-      await saveUser(name, email, phone, question, answer, role);
-      alert("Usuario registrado exitosamente.");
-      window.location.href = "../Cliente/products.html";  // Redirigir al login
+  // Verificar formato de correo
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailPattern.test(email)) {
+    alert("Formato de correo inválido");
+    return;
+  }
+
+  // Verificar existencia del correo
+  try {
+    const correoExiste = await verificarCorreoExistente(email);
+    const existenceValidation = document.getElementById('email-existence-validation');
+    
+    if (!correoExiste) {
+      existenceValidation.style.display = 'block';
+      document.getElementById('txt_email').classList.add('input-invalid');
+      return;
     } else {
-      await updateUser(id, { name, email, phone, question, answer, role});
-      alert("Usuario actualizado en Firestore.");
-      editStatus = false;
-      id = "";
-      btnRegistrar.innerText = "Registrarse";
+      existenceValidation.style.display = 'none';
     }
 
+    // Si pasa todas las validaciones, registrar en Firebase
+    if (!editStatus) {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await saveUser(name, email, phone, question, answer, role);
+      alert("Usuario registrado exitosamente.");
+      window.location.href = "../Cliente/products.html";
+    } else {
+      await updateUser(id, { name, email, phone, question, answer, role });
+      alert("Usuario actualizado.");
+      editStatus = false;
+    }
+    
     signUpForm.reset();
   } catch (error) {
-    console.error("Error al registrar o guardar usuario:", error);
-    alert("Este correo ya está registrado, por favor ingrese uno nuevo.");
-  }
-});
+    console.error("Error:", error);
+    if (error.code === 'auth/email-already-in-use') {
+      alert("Este correo electrónico ya está registrado");
+    } else {
+      alert("Error al registrar: " + error.message);
+    }
+}});
 
 // Validaciones en tiempo real
 function addValidationListeners() {
@@ -158,3 +201,57 @@ function addValidationListeners() {
 }
 
 document.addEventListener("DOMContentLoaded", addValidationListeners);
+
+// Función para verificar si el correo existe usando AbstractAPI
+async function verificarCorreoExistente(email) {
+  const apiKey = "7845f473a8fe47eea2ec16c0a62ff12c";
+  const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${apiKey}&email=${email}`;
+
+  try {
+    const respuesta = await fetch(url);
+    const datos = await respuesta.json();
+    return datos.deliverability === "DELIVERABLE";
+  } catch (error) {
+    console.error("Error en verificación:", error);
+    return false; // Considerar como inválido en caso de error
+  }
+}
+
+// Evento blur para el campo de correo electrónico
+document.getElementById("txt_email").addEventListener("blur", async () => {
+  const emailInput = document.getElementById("txt_email");
+  const email = emailInput.value.trim();
+  const emailValidation = document.getElementById("email-validation");
+  const existenceValidation = document.getElementById("email-existence-validation");
+
+  // Resetear estados
+  emailValidation.style.display = 'none';
+  existenceValidation.style.display = 'none';
+  emailInput.classList.remove('input-invalid', 'input-valid');
+
+  if (!email) {
+    emailValidation.style.display = 'block';
+    emailInput.classList.add('input-invalid');
+    return;
+  }
+
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailPattern.test(email)) {
+    emailValidation.style.display = 'block';
+    emailInput.classList.add('input-invalid');
+    return;
+  }
+
+  // Verificar existencia solo si el formato es válido
+  try {
+    const correoExiste = await verificarCorreoExistente(email);
+    if (!correoExiste) {
+      existenceValidation.style.display = 'block';
+      emailInput.classList.add('input-invalid');
+    } else {
+      emailInput.classList.add('input-valid');
+    }
+  } catch (error) {
+    console.error("Error en verificación:", error);
+  }
+});
